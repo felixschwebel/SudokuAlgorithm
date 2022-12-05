@@ -1,8 +1,10 @@
 import tkinter as tk
+from tkinter import messagebox
 from sudoku_solver import SudokuSolver
 
 FONT = ('Times New Roman', 24, "normal")
 
+# ---------------------------- FUNCTIONS ----------------------------
 # function to get the inputs
 def get_inputs():
     # Check all the Entry fields and put the values in a dictionary
@@ -49,9 +51,16 @@ def get_inputs():
         entry_data[entry]['row'] = row
         for col in range(1, 10):
             entry_data[entry]['col'] = col
-            entry_data[entry]['value'] = input_list[entry-1].get()
-            entry += 1
 
+            try:
+                value = int(input_list[entry-1].get())
+                if value > 9:
+                    return messagebox.showerror(message="Please make sure to only put in numbers between 1 and 9!")
+            except ValueError:
+                value = None
+            entry_data[entry]['value'] = value
+            entry += 1
+    print(entry_data)
     return entry_data
 
 
@@ -61,6 +70,8 @@ def solve():
     solver = SudokuSolver(get_inputs())
     # displays the found values
 
+
+# ------------------------------- UI -------------------------------
 # Set up the Window for Tkinter
 window = tk.Tk()
 window.title('Sudoku Solving')
