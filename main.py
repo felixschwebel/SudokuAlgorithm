@@ -6,8 +6,54 @@ FONT = ('Times New Roman', 24, "normal")
 # function to get the inputs
 def get_inputs():
     # Check all the Entry fields and put the values in a dictionary
+    # entry_data = {
+    #     1:{
+    #         "quadrant": 1,
+    #         "row": 1,
+    #         "column": 1,
+    #         "value": 3,
+    #     }
+    # }
     entry_data = {}
+    # get the values for the different quadrants
+    for n in range(3):
+        for m in range(1+n*27, 8+n*27, 3):
+            for k in range(3):
+                for l in range(m, m+3):
+                    number = l+k*9
+                    quadrant = None
+                    if m == 1:
+                        quadrant = 1
+                    elif m == 4:
+                        quadrant = 2
+                    elif m == 7:
+                        quadrant = 3
+                    elif m == 28:
+                        quadrant = 4
+                    elif m == 31:
+                        quadrant = 5
+                    elif m == 34:
+                        quadrant = 6
+                    elif m == 55:
+                        quadrant = 7
+                    elif m == 58:
+                        quadrant = 8
+                    elif m == 61:
+                        quadrant = 9
+                    entry_data[number] = {
+                        'quadrant': quadrant,
+                    }
+    # get the value of the entry field, the column and the row
+    entry = 1
+    for row in range(1, 10):
+        entry_data[entry]['row'] = row
+        for col in range(1, 10):
+            entry_data[entry]['col'] = col
+            entry_data[entry]['value'] = input_list[entry-1].get()
+            entry += 1
+
     return entry_data
+
 
 # Solve Sudoku
 def solve():
@@ -45,7 +91,7 @@ for i in range(9):
     y_start += 55
 
 # button to start the calculation
-button = tk.Button(text='Solve', bg='black', command=solve)
+button = tk.Button(text='Solve', bg='black', command=get_inputs)
 button.config(highlightthickness=0, highlightbackground='white', fg='red')
 button.grid(column=0, row=82, padx=20, pady=20)
 
