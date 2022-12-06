@@ -14,6 +14,7 @@ def get_inputs():
     #         "row": 1,
     #         "column": 1,
     #         "value": 3,
+    #         "original": True,
     #     }
     # }
     entry_data = {}
@@ -53,13 +54,18 @@ def get_inputs():
             entry_data[entry]['col'] = col
 
             try:
+                input_list[entry - 1].config(bg='white')
                 value = int(input_list[entry-1].get())
                 if value > 9:
+                    input_list[entry-1].config(bg='red')
                     return messagebox.showerror(message="Please make sure to only put in numbers between 1 and 9!")
+                entry_data[entry]['original'] = True
             except ValueError:
                 value = None
+                entry_data[entry]['original'] = False
             entry_data[entry]['value'] = value
             entry += 1
+
     print(entry_data)
     return entry_data
 
@@ -68,6 +74,7 @@ def get_inputs():
 def solve():
     # uses the SudokuSolver Class
     solver = SudokuSolver(get_inputs())
+    solver.solve()
     # displays the found values
 
 
@@ -102,7 +109,7 @@ for i in range(9):
     y_start += 55
 
 # button to start the calculation
-button = tk.Button(text='Solve', bg='black', command=get_inputs)
+button = tk.Button(text='Solve', bg='black', command=solve)
 button.config(highlightthickness=0, highlightbackground='white', fg='red')
 button.grid(column=0, row=82, padx=20, pady=20)
 
