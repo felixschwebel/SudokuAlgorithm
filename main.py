@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from sudoku_solver import SudokuSolver
+import collections
 
 FONT = ('Times New Roman', 24, "normal")
 
@@ -8,15 +9,6 @@ FONT = ('Times New Roman', 24, "normal")
 # function to get the inputs
 def get_inputs():
     # Check all the Entry fields and put the values in a dictionary
-    # entry_data = {
-    #     1:{
-    #         "quadrant": 1,
-    #         "row": 1,
-    #         "column": 1,
-    #         "value": 3,
-    #         "original": True,
-    #     }
-    # }
     entry_data = {}
     # get the values for the different quadrants
     for n in range(3):
@@ -45,29 +37,32 @@ def get_inputs():
                         quadrant = 9
                     entry_data[number] = {
                         'quadrant': quadrant,
+                        'possible_num': [],
                     }
     # get the value of the entry field, the column and the row
     entry = 1
     for row in range(1, 10):
-        entry_data[entry]['row'] = row
         for col in range(1, 10):
+            entry_data[entry]['row'] = row
             entry_data[entry]['col'] = col
 
             try:
                 input_list[entry - 1].config(bg='white')
                 value = int(input_list[entry-1].get())
+                # entry_data[entry]['possible_num'].remove(value)
                 if value > 9:
                     input_list[entry-1].config(bg='red')
                     return messagebox.showerror(message="Please make sure to only put in numbers between 1 and 9!")
-                entry_data[entry]['original'] = True
             except ValueError:
                 value = None
-                entry_data[entry]['original'] = False
             entry_data[entry]['value'] = value
             entry += 1
-
-    print(entry_data)
-    return entry_data
+    # get the list in order by field indices
+    ordered_data = []
+    for index in range(1, 82):
+        entry_data[index]['index'] = index
+        ordered_data.append(entry_data[index])
+    return ordered_data
 
 
 # Solve Sudoku
