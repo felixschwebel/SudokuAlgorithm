@@ -1,3 +1,4 @@
+import tkinter
 import tkinter as tk
 from tkinter import messagebox
 from sudoku_solver import SudokuSolver
@@ -55,6 +56,7 @@ def get_inputs():
                     return messagebox.showerror(message="Please make sure to only put in numbers between 1 and 9!")
             except ValueError:
                 value = None
+                entry_data[entry]['possible_num'] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             entry_data[entry]['value'] = value
             entry += 1
     # get the list in order by field indices
@@ -69,9 +71,11 @@ def get_inputs():
 def solve():
     # uses the SudokuSolver Class
     solver = SudokuSolver(get_inputs())
-    solver.solve()
+    data_solved = solver.solve()
     # displays the found values
-
+    for field in range(0, 81):
+        input_list[field].delete(0, tkinter.END)
+        input_list[field].insert(0, data_solved[field]['value'])
 
 # ------------------------------- UI -------------------------------
 # Set up the Window for Tkinter
