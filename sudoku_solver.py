@@ -3,8 +3,8 @@ class SudokuSolver:
     def __init__(self, entry_data):
         self.data = entry_data
         self.data_backup = None
-        self.guessed = []
-        self.guessed_checked = []
+        self.backup = False
+        self.checked = []
 
     def check_fields(self):
         for index in range(0, 81):
@@ -19,39 +19,34 @@ class SudokuSolver:
                                 pass
 
     def fill_values(self):
-        num_filled = 0
-        all_zero = True
-        print('**********START*********')
+        print("***************")
+        filled_values = 0
+        print(filled_values)
         for entry in self.data:
             print(len(entry['possible_num']))
             if len(entry['possible_num']) == 1:
                 entry['value'] = entry['possible_num'][0]
-                num_filled += 1
-            if len(entry['possible_num']) != 0:
-                all_zero = True
-            else:
-                all_zero = False
+                filled_values += 1
 
-        # if all_zero and self.missing_values():
-        #     self.data = self.data_backup
-        #     self.guessed = []
-
-
-        # if there is no field that has only one option
-        if num_filled == 0 and self.missing_values():
-            print(f"GUESSED: {self.guessed}")
-            for guessed in self.guessed:
-                temp = self.data[guessed]['value']
-                self.data[guessed]['possible_num'].append(temp)
-                self.data[guessed]['value'] = None
-            for index in range(0, 81):
-                if len(self.data[index]['possible_num']) == 2 and index not in self.guessed:
-                    if len(self.guessed_checked) == 0:
-                        self.guessed_checked.append(index)
-                    self.guessed.append(index)
-                    self.data_backup = copy.deepcopy(self.data)
-                    self.data[index]['value'] = self.data[index]['possible_num'][0]
+        if filled_values == 0 and self.backup == False:
+            self.data_backup = copy.deepcopy(self.data)
+            self.backup = True
+        if filled_values == 0 and self.missing_values():
+            self.data = copy.deepcopy(self.data_backup)
+            print(self.data)
+            for entry in range(0, 81):
+                if len(self.data[entry]['possible_num']) == 2 and self.checked.count(entry) < 2:
+                    if self.checked.count(entry) == 0:
+                        self.data[entry]['value'] = self.data[entry]['possible_num'][0]
+                    else:
+                        self.data[entry]['value'] = self.data[entry]['possible_num'][1]
                     break
+
+
+    def guess_value(self):
+        # void endless loops when a number has to be guessed
+        pass
+
 
     def missing_values(self):
         for entry in self.data:
