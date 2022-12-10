@@ -2,7 +2,6 @@ import tkinter
 import tkinter as tk
 from tkinter import messagebox
 from sudoku_solver import SudokuSolver
-import collections
 
 FONT = ('Times New Roman', 24, "normal")
 
@@ -46,16 +45,16 @@ def get_inputs():
         for col in range(1, 10):
             entry_data[entry]['row'] = row
             entry_data[entry]['col'] = col
-
+            # get the value of the field and check if it's between 1 and 9
             try:
                 input_list[entry - 1].config(bg='white')
                 value = int(input_list[entry-1].get())
-                # entry_data[entry]['possible_num'].remove(value)
                 if value > 9:
                     input_list[entry-1].config(bg='red')
                     return messagebox.showerror(message="Please make sure to only put in numbers between 1 and 9!")
             except ValueError:
                 value = None
+                # if the value is empty create a list with all values possible
                 entry_data[entry]['possible_num'] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             entry_data[entry]['value'] = value
             entry += 1
@@ -72,10 +71,11 @@ def solve():
     # uses the SudokuSolver Class
     solver = SudokuSolver(get_inputs())
     data_solved = solver.solve()
-    # displays the found values
+    # clear the field and display the found values
     for field in range(0, 81):
-        input_list[field].delete(0, tkinter.END)
-        input_list[field].insert(0, data_solved[field]['value'])
+        if data_solved[field]['value'] is not None:
+            input_list[field].delete(0, tkinter.END)
+            input_list[field].insert(0, data_solved[field]['value'])
 
 # ------------------------------- UI -------------------------------
 # Set up the Window for Tkinter
