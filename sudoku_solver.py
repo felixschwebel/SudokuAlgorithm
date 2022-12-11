@@ -34,22 +34,33 @@ class SudokuSolver:
             if self.backuped is False:
                 self.backup = copy.deepcopy(self.data)
                 self.backuped = True
-
-            print(self.backup)
-            self.data = copy.deepcopy(self.backup)
-
-            for entry in self.data:
-                if len(entry['possible_num']) == 2 and self.checked.count(entry['index']) < 2:
-                    if self.checked.count(entry['index']) == 0:
-                        entry['value'] = entry['possible_num'][0]
-                        self.checked.append(entry['index'])
-                    elif self.checked.count(entry['index']) == 1:
-                        entry['value'] = entry['possible_num'][1]
-                        self.checked.append(entry['index'])
-                    self.stop = True
-                    break
+            self.guess_value()
         else:
             self.stop = True
+
+    def guess_value(self):
+        self.data = copy.deepcopy(self.backup)
+
+        for entry in self.data:
+            if len(entry['possible_num']) == 2 and self.checked.count(entry['index']) < 2:
+                if self.checked.count(entry['index']) == 0:
+                    entry['value'] = entry['possible_num'][0]
+                    self.checked.append(entry['index'])
+                elif self.checked.count(entry['index']) == 1:
+                    entry['value'] = entry['possible_num'][1]
+                    self.checked.append(entry['index'])
+                self.stop = True
+                break
+
+    def check_rule(self):
+        for index in range(0, 81):
+            things_to_check = ['quadrant', 'col', 'row']
+            for thing in things_to_check:
+                possible_values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                for entry in self.data:
+                    if entry[thing] == self.data[index][thing]:
+                        if entry['value'] is not None:
+                            possible_values.remove(entry['value'])
 
 
     def missing_values(self):
@@ -62,6 +73,7 @@ class SudokuSolver:
 
 
     def solve(self):
+        self.check_rule()
         while not self.stop:
             self.check_fields()
             self.fill_values()
