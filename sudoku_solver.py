@@ -1,13 +1,15 @@
 import copy
+
+
 class SudokuSolver:
+    checked = []
+    backuped = False
+    error = False
+    stop = False
+    backup = None
+
     def __init__(self, entry_data):
         self.data = entry_data
-        self.stop = False
-        self.checked = []
-        self.backup = None
-        self.backuped = False
-        self.error = False
-        self.guessed = False
 
     def check_fields(self):
         for index in range(0, 81):
@@ -22,8 +24,7 @@ class SudokuSolver:
                                 pass
 
     def fill_values(self):
-        print(self.guessed)
-        if self.guessed is True:
+        if self.checked:
             self.check_rule()
         filled_values = 0
         for entry in self.data:
@@ -37,14 +38,15 @@ class SudokuSolver:
             if self.backuped is False:
                 self.backup = copy.deepcopy(self.data)
                 self.backuped = True
-            self.guessed = True
             self.guess_value()
         else:
             self.stop = True
 
     def guess_value(self):
+        print(self.data)
+        print("*********")
         self.data = copy.deepcopy(self.backup)
-        print(self.checked)
+        print(self.data)
         for entry in self.data:
             if len(entry['possible_num']) == 2 and self.checked.count(entry['index']) < 2:
                 if self.checked.count(entry['index']) == 0:
@@ -54,7 +56,6 @@ class SudokuSolver:
                     entry['value'] = entry['possible_num'][1]
                     self.checked.append(entry['index'])
                 self.stop = True
-                print(self.checked)
                 break
 
     def check_rule(self):
@@ -76,12 +77,9 @@ class SudokuSolver:
         if value_none == 81:
             self.stop = True
 
-
     def solve(self):
         while not self.stop:
             self.check_fields()
             self.fill_values()
             self.missing_values()
         return self.data
-
-

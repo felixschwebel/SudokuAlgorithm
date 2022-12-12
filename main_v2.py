@@ -1,7 +1,7 @@
 import tkinter
 import tkinter as tk
 from tkinter import messagebox
-from sudoku_solver import SudokuSolver
+import copy
 
 FONT = ('Times New Roman', 24, "normal")
 
@@ -67,15 +67,98 @@ def get_inputs():
     return ordered_data
 
 
-# Solve Sudoku
-def solve():
-    # uses the SudokuSolver Class
-    data_solved = SudokuSolver(get_inputs()).solve()
+# ----------------------------- SOLVE -----------------------------
+# Global Variables
+data = []
+backup = []
+stop = False
+checked = []
+backup_done = False
+
+
+def guess_value():
+    global data, checked, stop
+
+    data = copy.deepcopy(backup)
+    for entry in data:
+        if len(entry['possible_num']) == 2 and checked.count(entry['index']) < 2:
+            if checked.count(entry['index']) == 0:
+                entry['value'] = entry['possible_num'][0]
+                checked.append(entry['index'])
+            elif checked.count(entry['index']) == 1:
+                entry['value'] = entry['possible_num'][1]
+                checked.append(entry['index'])
+            stop = True
+            break
+
+
+def missing_values():
+    global stop
+
+    value_none = 0
+    for entry in data:
+        if entry['value'] is not None:
+            value_none += 1
+    if value_none == 81:
+        stop = True
+
+
+def display():
     # clear the field and display the found values
     for field in range(0, 81):
-        if data_solved[field]['value'] is not None:
+        if data[field]['value'] is not None:
             input_list[field].delete(0, tkinter.END)
-            input_list[field].insert(0, data_solved[field]['value'])
+            input_list[field].insert(0, data[field]['value'])
+
+
+def solve():
+    global data, stop, checked, backup_done, backup
+    data = get_inputs()
+    stop = False
+
+    while not stop:
+        # Check Fields
+        for index in range(0, 81):
+            things_to_check = ['quadrant', 'col', 'row']
+            for thing in things_to_check:
+                for entry in data:
+                    if entry[thing] == data[index][thing]:
+                        if entry['value'] is not None:
+                            try:
+                                data[index]['possible_num'].remove(entry['value'])
+                            except ValueError:
+                                pass
+
+        # Fill Values
+        filled_values = 0
+        if checked:
+            for index in range(1, 10):
+                possible_values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                for entry in data:
+                    if entry['quadrant'] == index:
+                        if len(entry['possible_num']) == 1:
+                            try:
+                                possible_values.remove(entry['possible_num'][0])
+                            except ValueError:
+                                guess_value()
+        for entry in data:
+            if len(entry['possible_num']) == 1:
+                entry['value'] = entry['possible_num'][0]
+                filled_values += 1
+
+        missing_values()
+
+        if filled_values == 0 and stop is not True:
+            if backup_done is False:
+                backup = copy.deepcopy(data)
+                backup_done = True
+            guess_value()
+
+        # Check for missing values
+        missing_values()
+
+    # Display values
+    display()
 
 
 # ------------------------------- UI -------------------------------
