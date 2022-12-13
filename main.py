@@ -2,6 +2,7 @@ import tkinter
 import tkinter as tk
 from tkinter import messagebox
 import copy
+import time
 
 FONT = ('Times New Roman', 24, "normal")
 
@@ -74,12 +75,15 @@ backup = []
 stop = False
 checked = []
 backup_done = False
+first_start = True
+start_time = None
 
 
 def guess_value():
     global data, checked, stop
 
-    data = copy.deepcopy(backup)
+    #data = copy.deepcopy(backup)
+
     for entry in data:
         if len(entry['possible_num']) == 2 and checked.count(entry['index']) < 2:
             if checked.count(entry['index']) == 0:
@@ -109,17 +113,23 @@ def display():
         if data[field]['value'] is not None:
             input_list[field].delete(0, tkinter.END)
             input_list[field].insert(0, data[field]['value'])
+        else:
+            input_list[field].delete(0, tkinter.END)
 
 
 def solve():
-    global data, stop, checked, backup_done, backup
-    data = get_inputs()
+    global data, stop, checked, backup_done, backup, first_start, start_time
+    # get the data from the user inputs when the solving starts
+    if first_start:
+        start_time = time.time()
+        data = get_inputs()
+        first_start = False
     stop = False
+    things_to_check = ['quadrant', 'col', 'row']
 
     while not stop:
         # Check Fields
         for index in range(0, 81):
-            things_to_check = ['quadrant', 'col', 'row']
             for thing in things_to_check:
                 for entry in data:
                     if entry[thing] == data[index][thing]:
@@ -132,15 +142,17 @@ def solve():
         # Fill Values
         filled_values = 0
         if checked:
-            for index in range(1, 10):
-                possible_values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                for entry in data:
-                    if entry['quadrant'] == index:
-                        if len(entry['possible_num']) == 1:
-                            try:
-                                possible_values.remove(entry['possible_num'][0])
-                            except ValueError:
-                                guess_value()
+            for thing in things_to_check:
+                for index in range(1, 10):
+                    possible_values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    for entry in data:
+                        # print(f"{entry['index']}: {entry['possible_num']}")
+                        if entry[thing] == index:
+                            if len(entry['possible_num']) == 1:
+                                try:
+                                    possible_values.remove(entry['possible_num'][0])
+                                except ValueError:
+                                    data = copy.deepcopy(backup)
         for entry in data:
             if len(entry['possible_num']) == 1:
                 entry['value'] = entry['possible_num'][0]
