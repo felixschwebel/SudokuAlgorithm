@@ -82,8 +82,6 @@ start_time = None
 def guess_value():
     global data, checked, stop
 
-    #data = copy.deepcopy(backup)
-
     for entry in data:
         if len(entry['possible_num']) == 2 and checked.count(entry['index']) < 2:
             if checked.count(entry['index']) == 0:
@@ -125,6 +123,7 @@ def solve():
         data = get_inputs()
         first_start = False
     stop = False
+
     things_to_check = ['quadrant', 'col', 'row']
 
     while not stop:
